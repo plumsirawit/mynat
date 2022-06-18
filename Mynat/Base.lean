@@ -46,4 +46,9 @@ theorem pow_succ (a b : mynat) : a ^ (succ b) = a ^ b * a := rfl
 axiom zero_ne_succ (m : mynat) : (zero : mynat) ≠ succ m
 axiom succ_inj {m n : mynat} (h : succ m = succ n) : m = n
 
+def myle (a b : mynat) :=  ∃ (c : mynat), b = a + c
+instance : LE mynat where
+  le := myle
+theorem le_iff_exists_add (a b : mynat) : a ≤ b ↔ ∃ (c : mynat), b = a + c := Iff.rfl
+
 end mynat
