@@ -14,6 +14,7 @@ lean_lib Mynat {
 lean_lib base
 lean_lib add
 lean_lib mul
+lean_lib pow
 
 lean_exe mynat {
   root := `Main
