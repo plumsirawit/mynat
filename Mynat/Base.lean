@@ -41,4 +41,9 @@ instance : Pow mynat mynat where
 theorem pow_zero (a : mynat) : a ^ zero = one := rfl
 theorem pow_succ (a b : mynat) : a ^ (succ b) = a ^ b * a := rfl
 
+-- Not sure if I'm correct by writing these lines...
+-- Seems like I cannot copy directly from https://github.com/ImperialCollegeLondon/natural_number_game/blob/master/src/mynat/definition.lean
+axiom zero_ne_succ (m : mynat) : (zero : mynat) ≠ succ m
+axiom succ_inj {m n : mynat} (h : succ m = succ n) : m = n
+
 end mynat
