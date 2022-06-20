@@ -8,11 +8,13 @@ theorem mul_pos (a b : mynat) : a ≠ zero → b ≠ zero → a * b ≠ zero := 
   intro h2
   cases a
   case zero =>
-    contradiction
+    rw [zero_mul]
+    exact h1
   case succ a' =>
     cases b
     case zero =>
-      contradiction
+      rw [mul_zero]
+      exact h2
     case succ b' =>
       rw [mul_succ]
       rw [succ_mul]
@@ -31,7 +33,11 @@ theorem eq_zero_or_eq_zero_of_mul_eq_zero (a b : mynat) (h : a * b = zero) :
       apply Or.intro_right
       rfl
     case succ b' =>
-      contradiction
+      apply False.elim
+      have samtz := succ_ne_zero a'
+      have sbmtz := succ_ne_zero b'
+      have hfalse := (mul_pos (succ a') (succ b')) samtz sbmtz
+      exact hfalse h
 
 theorem mul_eq_zero_iff (a b : mynat): a * b = zero ↔ a = zero ∨ b = zero := by
   apply Iff.intro
@@ -54,7 +60,8 @@ theorem mul_left_cancel (a b c : mynat) (ha : a ≠ zero) : a * b = a * c → b 
     have aorb := (mul_eq_zero_iff a b).mp h
     cases aorb
     case inl hh =>
-      contradiction
+      apply False.elim
+      exact ha hh
     case inr hh =>
       exact hh
   case succ c' hc =>
@@ -67,8 +74,8 @@ theorem mul_left_cancel (a b c : mynat) (ha : a ≠ zero) : a * b = a * c → b 
         a * c' + a = zero := by rw[h']
       )
       have haz := add_left_eq_zero h''
-      --have hfalse := ha haz
-      contradiction
+      apply False.elim
+      exact ha haz
     case succ b' =>
       rw [mul_succ]
       intro hhh

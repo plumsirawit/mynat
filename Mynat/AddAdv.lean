@@ -62,9 +62,10 @@ theorem add_left_eq_zero {{a b : mynat}} (H : a + b = zero) : b = zero := by
   case zero =>
     rfl
   case succ b' =>
-    --rw [add_succ] at H
-    --have h' := (succ_ne_zero (a+b')) H
-    contradiction
+    rw [add_succ] at H
+    have h' := (succ_ne_zero (a+b')) H
+    apply False.elim
+    exact h'
 
 theorem add_right_eq_zero {a b : mynat} : a + b = zero → a = zero := by
   rw [add_comm]
