@@ -148,8 +148,49 @@ theorem add_le_add_left {a b : mynat} (h : a ≤ b) (t : mynat) :
     rw [hc]
     rw [← add_assoc]
 
-theorem lt_aux_one (a b : mynat) : a ≤ b ∧ ¬ (b ≤ a) → succ a ≤ b := sorry
-theorem lt_aux_two (a b : mynat) : succ a ≤ b → a ≤ b ∧ ¬ (b ≤ a) := sorry
+theorem lt_aux_one (a b : mynat) : a ≤ b ∧ ¬ (b ≤ a) → succ a ≤ b := by
+  intro h
+  have h1 := h.left
+  have h2 := h.right
+  cases h1 with
+  | intro c hc =>
+    cases c
+    case zero =>
+      -- by contradiction
+      rw [add_zero] at hc
+      rw [hc] at h2
+      apply False.elim
+      exact h2 (le_refl a)
+    case succ c' =>
+      exists c'
+      rw [succ_add]
+      rw [add_succ] at hc
+      exact hc
+
+theorem lt_aux_two (a b : mynat) : succ a ≤ b → a ≤ b ∧ ¬ (b ≤ a) := by
+  intro h
+  cases h with
+  | intro c hc =>
+    apply And.intro
+    case intro.left =>
+      exists succ c
+      rw [add_succ]
+      rw [succ_add] at hc
+      exact hc
+    case intro.right =>
+      intro hh
+      rw [hc] at hh
+      rw [succ_add] at hh
+      rw [← add_succ] at hh
+      cases hh with
+      | intro d hd =>
+        conv at hd =>
+          lhs
+          rw [← add_zero a]
+        rw [add_assoc] at hd
+        have hfalse := add_left_cancel a zero (succ c + d) hd
+        have hsz := add_right_eq_zero (Eq.symm hfalse)
+        exact zero_ne_succ c (Eq.symm hsz)
 
 def mylt (a b : mynat) := a ≤ b ∧ ¬ (b ≤ a)
 -- incantation so that we can use `<` notation: 
