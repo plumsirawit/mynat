@@ -7,13 +7,13 @@ instance : LE mynat where
   le := myle
 theorem le_iff_exists_add (a b : mynat) : a ≤ b ↔ ∃ (c : mynat), b = a + c := Iff.rfl
 
-theorem one_add_le_self (x : mynat) : x ≤ one + x := by
+theorem one_add_le_self (x : mynat) : x ≤ 1 + x := by
   rw [le_iff_exists_add]
-  exists one
+  exists 1
   rw [add_comm]
 
 theorem le_refl (x : mynat) : x ≤ x :=
-  Exists.intro zero rfl
+  Exists.intro 0 rfl
 
 -- attribute [rfl] mynat.le_refl
 -- Why doesn't it work?
@@ -26,7 +26,7 @@ theorem le_succ (a b : mynat) : a ≤ b → a ≤ (succ b) := by
     rw [add_succ]
     rw [hc]
 
-theorem zero_le (a : mynat) : zero ≤ a := by
+theorem zero_le (a : mynat) : 0 ≤ a := by
   rw [le_iff_exists_add]
   exists a
   rw [zero_add]
@@ -52,16 +52,16 @@ theorem le_antisymm (a b : mynat) (hab : a ≤ b) (hba : b ≤ a) : a = b := by
         lhs
         rw [← add_zero a]
       rw [add_assoc] at hd
-      have halc := (add_left_cancel a zero (c+d)) hd
+      have halc := (add_left_cancel a 0 (c+d)) hd
       have halcsym := Eq.symm halc
       have hcez := add_right_eq_zero halcsym
       rw [hcez] at hc
       rw [add_zero] at hc
       exact Eq.symm hc
 
-theorem le_zero (a : mynat) (h : a ≤ zero) : a = zero := by
+theorem le_zero (a : mynat) (h : a ≤ 0) : a = 0 := by
   have hh := zero_le a
-  exact le_antisymm a zero h hh
+  exact le_antisymm a 0 h hh
 
 theorem succ_le_succ (a b : mynat) (h : a ≤ b) : succ a ≤ succ b := by
   cases h with
@@ -90,8 +90,9 @@ theorem le_total (a b : mynat) : a ≤ b ∨ b ≤ a := by
       | intro c hc =>
         cases c
         case zero =>
+          rw [mynat_zero_eq_zero] at hc
           apply Or.intro_left
-          exists one
+          exists 1
           rw [hc]
           rw [add_assoc]
           rw [zero_add]
@@ -104,7 +105,7 @@ theorem le_total (a b : mynat) : a ≤ b ∨ b ≤ a := by
           rw [add_succ]
 
 theorem le_succ_self (a : mynat) : a ≤ succ a := by
-  exists one
+  exists 1
 
 theorem add_le_add_right {a b : mynat} : a ≤ b → ∀ t, (a + t) ≤ (b + t) := by
   intro h
@@ -124,10 +125,10 @@ theorem le_of_succ_le_succ (a b : mynat) : succ a ≤ succ b → a ≤ b := by
     exists c
     rw [succ_eq_add_one] at hc
     rw [succ_eq_add_one] at hc
-    rw [add_comm b one] at hc
-    rw [add_comm a one] at hc
+    rw [add_comm b 1] at hc
+    rw [add_comm a 1] at hc
     rw [add_assoc] at hc
-    exact add_left_cancel one b (a + c) hc
+    exact add_left_cancel 1 b (a + c) hc
 
 theorem not_succ_le_self (a : mynat) : ¬ (succ a ≤ a) := by
   intro h
@@ -138,7 +139,7 @@ theorem not_succ_le_self (a : mynat) : ¬ (succ a ≤ a) := by
       lhs
       rw [← add_zero a]
     rw [add_assoc] at hc
-    have hd := add_left_cancel a zero (one + c) hc
+    have hd := add_left_cancel a 0 (1 + c) hc
     rw [add_comm] at hd
     rw [← succ_eq_add_one] at hd
     have hnd := zero_ne_succ c
@@ -160,6 +161,7 @@ theorem lt_aux_one (a b : mynat) : a ≤ b ∧ ¬ (b ≤ a) → succ a ≤ b := 
   | intro c hc =>
     cases c
     case zero =>
+      rw [mynat_zero_eq_zero] at hc
       -- by contradiction
       rw [add_zero] at hc
       rw [hc] at h2
@@ -192,7 +194,7 @@ theorem lt_aux_two (a b : mynat) : succ a ≤ b → a ≤ b ∧ ¬ (b ≤ a) := 
           lhs
           rw [← add_zero a]
         rw [add_assoc] at hd
-        have hfalse := add_left_cancel a zero (succ c + d) hd
+        have hfalse := add_left_cancel a 0 (succ c + d) hd
         have hsz := add_right_eq_zero (Eq.symm hfalse)
         exact zero_ne_succ c (Eq.symm hsz)
 

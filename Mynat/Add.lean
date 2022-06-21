@@ -4,18 +4,18 @@ namespace mynat
 
 def myadd (m n : mynat) : mynat :=
   match n with
-  | zero   => m
+  | 0   => m
   | succ n' => succ (myadd m n')
 
 instance : Add mynat where
   add := myadd
 
-theorem add_zero (m : mynat) : m + zero = m := rfl
+theorem add_zero (m : mynat) : m + 0 = m := rfl
 theorem add_succ (m n : mynat) : m + succ n = succ (m + n) := rfl
 
-theorem zero_add (n : mynat) : zero + n = n := by
+theorem zero_add (n : mynat) : 0 + n = n := by
   cases n
-  case zero => rfl
+  . rfl
   case succ m =>
     have h := congrArg succ (zero_add m)
     rw [←add_succ] at h
@@ -24,6 +24,7 @@ theorem zero_add (n : mynat) : zero + n = n := by
 theorem add_assoc (a b c : mynat) : (a + b) + c = a + (b + c) := by
   cases c
   case zero =>
+    rw [mynat_zero_eq_zero]
     repeat {rw [add_zero]}
     rfl
   case succ m =>
@@ -35,6 +36,7 @@ theorem add_assoc (a b c : mynat) : (a + b) + c = a + (b + c) := by
 theorem succ_add (a b : mynat) : succ a + b = succ (a + b) := by
   cases b
   case zero =>
+    rw [mynat_zero_eq_zero]
     repeat {rw [add_zero]}
     rfl
   case succ m =>
@@ -45,6 +47,7 @@ theorem succ_add (a b : mynat) : succ a + b = succ (a + b) := by
 theorem add_comm (a b : mynat) : a + b = b + a := by
   cases b
   case zero =>
+    rw [mynat_zero_eq_zero]
     rw [add_zero]
     rw [zero_add]
   case succ m =>
@@ -52,9 +55,9 @@ theorem add_comm (a b : mynat) : a + b = b + a := by
     rw [succ_add]
     rw [add_comm a m]
 
-theorem succ_eq_add_one (n : mynat) : succ n = n + one := by
-  rw [one]
-  rw [add_succ n zero]
+theorem succ_eq_add_one (n : mynat) : succ n = n + 1 := by
+  rw [one_eq_succ_zero]
+  rw [add_succ n 0]
   rw [add_zero]
 
 theorem add_right_comm (a b c : mynat) : a + b + c = a + c + b := by

@@ -10,27 +10,29 @@ def mymul (m n : mynat) : mynat :=
 instance : Mul mynat where
   mul := mymul
 
-theorem mul_zero (a : mynat) : a * zero = zero := rfl
+theorem mul_zero (a : mynat) : a * 0 = 0 := rfl
 theorem mul_succ (a b : mynat) : a * (succ b) = a * b + a := rfl
 
-theorem zero_mul (m : mynat) : zero * m = zero := by
+theorem zero_mul (m : mynat) : 0 * m = 0 := by
   cases m
   case zero =>
+    rw [mynat_zero_eq_zero]
     rfl
   case succ m' =>
     rw [mul_succ]
     rw [zero_mul m']
     rfl
 
-theorem mul_one (m : mynat) : m * one = m := by
-  rw [one]
+theorem mul_one (m : mynat) : m * 1 = m := by
+  rw [one_eq_succ_zero]
   rw [mul_succ]
   rw [mul_zero]
   rw [zero_add]
 
-theorem one_mul (m : mynat) : one * m = m := by
+theorem one_mul (m : mynat) : 1 * m = m := by
   cases m
   case zero =>
+    rw [mynat_zero_eq_zero]
     rw [mul_zero]
   case succ m' =>
     rw [mul_succ]
@@ -40,6 +42,7 @@ theorem one_mul (m : mynat) : one * m = m := by
 theorem mul_add (t a b : mynat) : t * (a + b) = t * a + t * b := by
   cases b
   case zero =>
+    rw [mynat_zero_eq_zero]
     rw [add_zero]
     rw [mul_zero]
     rw [add_zero]
@@ -53,6 +56,7 @@ theorem mul_add (t a b : mynat) : t * (a + b) = t * a + t * b := by
 theorem mul_assoc (a b c : mynat) : (a * b) * c = a * (b * c) := by
   cases c
   case zero =>
+    rw [mynat_zero_eq_zero]
     rw [mul_zero]
     rw [mul_zero]
     rw [mul_zero]
@@ -64,6 +68,7 @@ theorem mul_assoc (a b c : mynat) : (a * b) * c = a * (b * c) := by
 theorem succ_mul (a b : mynat) : succ a * b = a * b + b := by
   cases b
   case zero =>
+    rw [mynat_zero_eq_zero]
     rw [mul_zero]
     rw [mul_zero]
     rfl
@@ -80,6 +85,7 @@ theorem succ_mul (a b : mynat) : succ a * b = a * b + b := by
 theorem add_mul (a b t : mynat) : (a + b) * t = a * t + b * t := by
   cases t
   case zero =>
+    rw [mynat_zero_eq_zero]
     repeat {rw [mul_zero]}
     rfl
   case succ t' =>
@@ -96,6 +102,7 @@ theorem add_mul (a b t : mynat) : (a + b) * t = a * t + b * t := by
 theorem mul_comm (a b : mynat) : a * b = b * a := by
   cases b
   case zero =>
+    rw [mynat_zero_eq_zero]
     rw [mul_zero]
     rw [zero_mul]
   case succ b' =>
