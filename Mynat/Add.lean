@@ -2,6 +2,17 @@ import Mynat.Base
 
 namespace mynat
 
+def myadd (m n : mynat) : mynat :=
+  match n with
+  | zero   => m
+  | succ n' => succ (myadd m n')
+
+instance : Add mynat where
+  add := myadd
+
+theorem add_zero (m : mynat) : m + zero = m := rfl
+theorem add_succ (m n : mynat) : m + succ n = succ (m + n) := rfl
+
 theorem zero_add (n : mynat) : zero + n = n := by
   cases n
   case zero => rfl

@@ -1,7 +1,17 @@
-import Mynat.Base
 import Mynat.Add
 
 namespace mynat
+
+def mymul (m n : mynat) : mynat :=
+  match n with
+  | zero => zero
+  | succ n' => myadd (mymul m n') m
+
+instance : Mul mynat where
+  mul := mymul
+
+theorem mul_zero (a : mynat) : a * zero = zero := rfl
+theorem mul_succ (a b : mynat) : a * (succ b) = a * b + a := rfl
 
 theorem zero_mul (m : mynat) : zero * m = zero := by
   cases m

@@ -1,7 +1,11 @@
-import Mynat.AddAdv
 import Mynat.MulAdv
 
 namespace mynat
+
+def myle (a b : mynat) :=  ∃ (c : mynat), b = a + c
+instance : LE mynat where
+  le := myle
+theorem le_iff_exists_add (a b : mynat) : a ≤ b ↔ ∃ (c : mynat), b = a + c := Iff.rfl
 
 theorem one_add_le_self (x : mynat) : x ≤ one + x := by
   rw [le_iff_exists_add]

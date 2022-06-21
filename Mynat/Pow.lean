@@ -1,8 +1,17 @@
-import Mynat.Base
-import Mynat.Add
 import Mynat.Mul
 
 namespace mynat
+
+def mypow (m n : mynat) : mynat :=
+  match n with
+  | zero => one
+  | succ n' => mymul (mypow m n') m
+
+instance : Pow mynat mynat where
+  pow := mypow
+
+theorem pow_zero (a : mynat) : a ^ zero = one := rfl
+theorem pow_succ (a b : mynat) : a ^ (succ b) = a ^ b * a := rfl
 
 theorem zero_pow_zero : (zero : mynat) ^ (zero : mynat) = one := by
   rw [pow_zero]
