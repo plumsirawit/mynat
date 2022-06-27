@@ -94,4 +94,38 @@ example : (5 : myint) - (2 : myint) ≈ (3 : myint) := by
   rw [sub_eq_plusneg]
   exact hlast
 
+theorem sub_right (a b t : myint) : a ≈ b → a - t ≈ b - t := by
+  rw [sub_eq_plusneg]
+  exact add_right a b (-t)
+
+theorem add_right_cancel (a t b : myint) : a + t ≈ b + t → a ≈ b := by
+  intro h
+  have hmt := add_right (a+t) (b+t) (-t) h
+  have hassoc := symm (add_assoc a t (-t))
+  rw [← equiv_is_myequal] at hassoc
+  have ha := trans hassoc hmt
+  rw [← equiv_is_myequal] at ha
+  have hb := trans ha (add_assoc b t (-t))
+  rw [← equiv_is_myequal] at hb
+  have hni := neg_is_inv t
+  have hb0 := trans hb (add_left b (t + -t) 0 hni)
+  rw [← equiv_is_myequal] at hb0
+  have hb1 := trans hb0 (add_zero b)
+  rw [← equiv_is_myequal] at hb1
+  have ha0 := trans (symm (add_left a (t + -t) 0 hni)) hb1
+  have ha1 := symm ha0
+  have ha2 := trans ha1 (add_zero a)
+  exact symm ha2
+
+theorem add_left_cancel (t a b : myint) : t + a ≈ t + b → a ≈ b := by
+  rw [add_comm t a]
+  rw [add_comm t b]
+  exact add_right_cancel a t b
+
+theorem add_right_cancel_iff (t a b : myint) : a + t ≈ b + t ↔ a ≈ b := by
+  apply Iff.intro
+  . exact add_right_cancel a t b
+  . intro h
+    exact add_right a b t h
+
 end myint
