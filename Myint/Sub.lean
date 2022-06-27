@@ -1,4 +1,3 @@
-import Mynat.Ineq
 import Myint.Add
 
 namespace myint

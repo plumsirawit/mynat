@@ -77,5 +77,8 @@ theorem equal_implies_equiv (a b : myint) : a = b → a ≈ b := by
 theorem destruct_x (ax ay : mynat) : ({ x := ax, y := ay } : myint).x = ax := rfl
 theorem destruct_y (ax ay : mynat) : ({ x := ax, y := ay } : myint).y = ay := rfl
 
-theorem default_nat_has_no_y (n : Nat) : (myintofnat n).y = 0 := by
-  rw [myintofnat]
+theorem default_nat_has_no_y (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).y = 0 := by
+  rw [OfNat.ofNat, instOfNatMyint, myintofnat]
+
+theorem default_nat_has_same_x (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).x = myofnat n := by
+  rw [OfNat.ofNat, instOfNatMyint, myintofnat]

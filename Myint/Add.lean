@@ -1,4 +1,3 @@
-import Mynat.Ineq
 import Myint.Base
 
 namespace myint
@@ -107,5 +106,14 @@ theorem add_left (t a b : myint) : a ≈ b → t + a ≈ t + b := by
   rw [add_comm t]
   rw [add_comm t]
   exact add_right a b t h
+
+theorem add_equiv (a b c d : myint) : a ≈ b ∧ c ≈ d → a + c ≈ b + d := by
+  intro h
+  have h1 := And.left h
+  have h2 := And.right h
+  have hac := add_right a b c h1
+  have hbd := add_left b c d h2
+  -- Why must I type `_root_`?
+  exact _root_.trans hac hbd
 
 end myint
