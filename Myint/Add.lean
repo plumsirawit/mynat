@@ -81,4 +81,31 @@ theorem add_comm (a b : myint) : a + b = b + a := by
 
 attribute [simp] add_assoc add_comm
 
+theorem add_right (a b t : myint) : a ≈ b → a + t ≈ b + t := by
+  intro h
+  rw [equiv_is_myequal] at h ⊢ 
+  rw [myequal] at h ⊢
+  rw [add_x]
+  rw [add_y]
+  rw [add_y]
+  rw [add_x]
+  rw [← mynat.add_assoc (a.x + t.x) _ _]
+  rw [mynat.add_assoc a.x t.x]
+  rw [mynat.add_comm t.x b.y]
+  rw [← mynat.add_assoc a.x _]
+  rw [← mynat.add_assoc (a.y + t.y)]
+  rw [mynat.add_assoc a.y]
+  rw [mynat.add_comm t.y]
+  rw [← mynat.add_assoc]
+  rw [h]
+  rw [mynat.add_assoc (a.y + b.x)]
+  rw [mynat.add_comm t.x]
+  rw [← mynat.add_assoc]
+
+theorem add_left (t a b : myint) : a ≈ b → t + a ≈ t + b := by
+  intro h
+  rw [add_comm t]
+  rw [add_comm t]
+  exact add_right a b t h
+
 end myint

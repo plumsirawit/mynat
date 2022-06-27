@@ -62,9 +62,6 @@ instance : Equivalence myequal where
   symm := symm
   trans := trans
 
-instance : Trans myequal myequal myequal where
-  trans := trans
-
 instance : HasEquiv myint where
   Equiv := myequal
 
