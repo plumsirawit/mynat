@@ -113,7 +113,6 @@ theorem add_equiv (a b c d : myint) : a ≈ b ∧ c ≈ d → a + c ≈ b + d :=
   have h2 := And.right h
   have hac := add_right a b c h1
   have hbd := add_left b c d h2
-  -- Why must I type `_root_`?
-  exact _root_.trans hac hbd
+  exact trans hac hbd
 
 end myint

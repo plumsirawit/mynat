@@ -9,11 +9,13 @@ structure myint where
 -- ℕ × ℕ ⧸ ∼
 -- ∼ = {((a, b), (c, d)) ∈ (ℕ × ℕ)² : a + d = b + c} 
 
+namespace myint
+
 def myequal (a b : myint) : Prop :=
   (a.x + b.y) = (a.y + b.x)
 
 def myintofnat (n : Nat) :=
-  myint.mk (myofnat n) 0
+  myint.mk (mynat.myofnat n) 0
 
 instance : OfNat myint n where
   ofNat := myintofnat n
@@ -80,5 +82,7 @@ theorem destruct_y (ax ay : mynat) : ({ x := ax, y := ay } : myint).y = ay := rf
 theorem default_nat_has_no_y (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).y = 0 := by
   rw [OfNat.ofNat, instOfNatMyint, myintofnat]
 
-theorem default_nat_has_same_x (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).x = myofnat n := by
+theorem default_nat_has_same_x (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).x = mynat.myofnat n := by
   rw [OfNat.ofNat, instOfNatMyint, myintofnat]
+
+end myint

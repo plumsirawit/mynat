@@ -3,6 +3,8 @@ inductive mynat where
   | succ : mynat → mynat
   deriving Repr
 
+namespace mynat
+
 def myofnat (n : Nat) :=
   match n with
   | 0 => mynat.zero
@@ -21,4 +23,6 @@ instance : Coe mynat Nat where
 
 theorem mynat_zero_eq_zero : mynat.zero = 0 := rfl
 theorem one_eq_succ_zero : 1 = mynat.succ 0 := rfl
+
+end mynat
 

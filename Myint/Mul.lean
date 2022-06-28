@@ -32,9 +32,9 @@ theorem mul_one (a : myint) : a * 1 ≈ a := by
   rw [default_nat_has_no_y]
   rw [mynat.mul_zero, mynat.mul_zero]
   rw [mynat.add_zero, mynat.zero_add]
-  rw [myofnat, myofnat]
-  rw [mynat_zero_eq_zero]
-  rw [← one_eq_succ_zero]
+  rw [mynat.myofnat, mynat.myofnat]
+  rw [mynat.mynat_zero_eq_zero]
+  rw [← mynat.one_eq_succ_zero]
   rw [mynat.mul_one, mynat.mul_one]
   apply if_x_and_y_equal_then_equiv
   apply And.intro
@@ -46,14 +46,14 @@ theorem mul_negone (a : myint) : a * -1 ≈ -a := by
     rw [neg_eq_myneg]
     rw [myneg]
     rw [destruct_x]
-    rw [OfNat.ofNat, instOfNatMyint, myintofnat]
+    rw [default_nat_has_no_y]
   have hnegoney : (-1 : myint).y = 1 := by
     rw [neg_eq_myneg]
     rw [myneg]
     rw [destruct_y]
-    rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-    simp
-    rw [myofnat, myofnat]
+    rw [default_nat_has_same_x]
+    rw [mynat.myofnat, mynat.myofnat]
+    rw [mynat.mynat_zero_eq_zero]
     rfl
   rw [mul_eq_mymul]
   rw [mymul]
@@ -77,7 +77,7 @@ theorem mul_negone (a : myint) : a * -1 ≈ -a := by
 theorem one_mul (m : myint) : 1 * m ≈ m := by
   rw [mul_eq_mymul, mymul]
   rw [default_nat_has_same_x]
-  rw [myofnat, myofnat, mynat_zero_eq_zero, ← one_eq_succ_zero]
+  rw [mynat.myofnat, mynat.myofnat, mynat.mynat_zero_eq_zero, ← mynat.one_eq_succ_zero]
   rw [default_nat_has_no_y]
   rw [mynat.zero_mul, mynat.zero_mul]
   rw [mynat.one_mul, mynat.one_mul]
@@ -186,7 +186,7 @@ theorem add_mul (a b t : myint) : (a + b) * t ≈ a * t + b * t := by
   have h3 : t * a ≈ a * t := mul_comm t a
   have h4 : t * b ≈ b * t := mul_comm t b
   have h5 := add_equiv (t * a) (a * t) (t * b) (b * t) ⟨ h3, h4 ⟩
-  exact trans (_root_.trans h1 h2) h5
+  exact trans (trans h1 h2) h5
 
 theorem mul_right (a b t : myint) : a ≈ b → a * t ≈ b * t := by
   intro h
@@ -218,7 +218,7 @@ theorem mul_left_comm (a b c : myint) : a * (b * c) ≈ b * (a * c) := by
   have h1 : a * (b * c) ≈ a * b * c := symm (mul_assoc a b c)
   have h2 : a * b * c ≈ b * a * c := mul_right (a * b) (b * a) c (mul_comm a b)
   have h3 : b * a * c ≈ b * (a * c) := mul_assoc b a c
-  exact _root_.trans (trans h1 h2) h3
+  exact trans (trans h1 h2) h3
 
 attribute [simp] mul_assoc mul_comm mul_left_comm
 

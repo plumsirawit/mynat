@@ -56,7 +56,7 @@ example : (5 : myint) - (2 : myint) ≈ (3 : myint) := by
     rw [← equiv_is_myequal] at happ
     exact happ
   rw [sub_eq_plusneg] at this
-  have htrans := _root_.trans this (symm (add_assoc (3 : myint) (2 : myint) (-2 : myint)))
+  have htrans := trans this (symm (add_assoc (3 : myint) (2 : myint) (-2 : myint)))
   rw [← equiv_is_myequal] at htrans
   have : (3 : myint) + (2 : myint) ≈ (5 : myint) := by
     apply if_x_and_y_equal_then_equiv
@@ -64,34 +64,21 @@ example : (5 : myint) - (2 : myint) ≈ (3 : myint) := by
     rw [add_y]
     apply And.intro
     case a.left =>
-      rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-      simp
-      rw [myofnat, myofnat, myofnat, myofnat]
-      rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-      simp
-      rw [myofnat, myofnat, myofnat]
-      rw [mynat.add_succ, mynat.add_succ, mynat.succ_add, mynat.succ_add]
-      rw [mynat_zero_eq_zero, mynat.zero_add]
-      conv =>
-        rhs
-        rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-        simp
+      repeat rw [default_nat_has_same_x]
+      repeat rw [mynat.myofnat]
+      rw [mynat.mynat_zero_eq_zero]
+      repeat rw [mynat.add_succ]
+      rw [mynat.add_zero]
     case a.right =>
-      rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-      simp
-      rw [mynat.zero_add]
-      rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-      simp
-      conv =>
-        rhs
-        rw [OfNat.ofNat, instOfNatMyint, myintofnat]
-        simp
-  have hr := (add_right _ _ (-2)) this
-  have htrans2 := trans htrans hr
-  have hlast := symm htrans2
+      repeat rw [default_nat_has_no_y]
+      rfl
+  have : (3 : myint) + (2 : myint) + (-2 : myint) ≈ (5 : myint) + (-2 : myint) :=
+    (add_right _ _ (-2)) this
+  have : (3 : myint) ≈ (5 : myint) + (-2 : myint) := trans htrans this
+  have : (5 : myint) + (-2 : myint) ≈ (3 : myint) := symm this
   rw [equiv_is_myequal]
   rw [sub_eq_plusneg]
-  exact hlast
+  exact this
 
 theorem sub_right (a b t : myint) : a ≈ b → a - t ≈ b - t := by
   rw [sub_eq_plusneg]
