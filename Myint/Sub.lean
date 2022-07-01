@@ -46,18 +46,17 @@ theorem negneg_eq_self (m : myint) : -(-m) ≈ m := by
 
 example : (5 : myint) - (2 : myint) ≈ (3 : myint) := by
   have : (3 : myint) ≈ (3 : myint) := rfl
-  have : (3 : myint) ≈ (3 : myint) + (0 : myint) := by exact add_zero 3
+  have : (3 : myint) ≈ (3 : myint) + (0 : myint) := rfl
   have : (3 : myint) ≈ (3 : myint) + (2 - 2 : myint) := by
     rw [sub_eq_plusneg]
-    have htinv := symm (neg_is_inv 2)
-    rw [← equiv_is_myequal] at htinv
-    have hleft := add_left 3 0 (2 + -2) htinv
-    have happ := trans this hleft
-    rw [← equiv_is_myequal] at happ
+    have htinv : 0 ≈ (2 + -2) := symm (neg_is_inv 2)
+    have hleft : 3 + 0 ≈ 3 + (2 + -2) := add_left 3 0 (2 + -2) htinv
+    have happ : 3 ≈ (3 + (2 + -2)) := trans this hleft
     exact happ
   rw [sub_eq_plusneg] at this
-  have htrans := trans this (symm (add_assoc (3 : myint) (2 : myint) (-2 : myint)))
-  rw [← equiv_is_myequal] at htrans
+  have htrans : 3 ≈ (3 + 2 + -2) := trans
+    this
+    (symm (add_assoc (3 : myint) (2 : myint) (-2 : myint)))
   have : (3 : myint) + (2 : myint) ≈ (5 : myint) := by
     apply if_x_and_y_equal_then_equiv
     rw [add_x]
