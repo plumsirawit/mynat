@@ -265,6 +265,53 @@ theorem eq_zero_or_eq_zero_of_mul_eq_zero (a b : myint) (h : a * b ≈ 0) :
     apply Or.intro_right
     have h'' : a.x ≠ a.y := h'
     have hfull : a.x * b.x + a.y * b.y + a.x * b.y + a.y * b.x = a.x * b.y + a.y * b.x + a.x * b.y + a.y * b.x := by rw [h]
+    cases mynat.le_total a.x a.y
+    case right.h.inl hh =>
+      rw [mynat.le_iff_exists_add] at hh
+      cases hh with
+      | intro c hc =>
+        rw [hc] at hfull
+        repeat rw [mynat.add_mul] at hfull
+        simp at hfull
+        have := mynat.add_left_cancel (c * b.x) _ _ hfull
+        have := mynat.add_left_cancel _ _ _ this
+        have := mynat.add_left_cancel _ _ _ this
+        repeat rw [← mynat.add_assoc] at this
+        rw [mynat.add_comm (c * b.x) _] at this
+        have := mynat.add_right_cancel _ _ _ this
+        have hlast := mynat.add_left_cancel _ _ _ this
+        rename_i h_ h__ h___ -- this is so dirty ...
+        cases c
+        case zero =>
+          apply False.elim
+          rw [mynat.mynat_zero_eq_zero] at hc
+          rw [mynat.add_zero] at hc
+          exact h'' (Eq.symm hc)
+        case succ d =>
+          have hsnez := mynat.succ_ne_zero d
+          exact Eq.symm (mynat.mul_left_cancel (mynat.succ d) b.y b.x hsnez hlast)
+    case right.h.inr hh =>
+      rw [mynat.le_iff_exists_add] at hh
+      cases hh with
+      | intro c hc =>
+        rw [hc] at hfull
+        repeat rw [mynat.add_mul] at hfull
+        simp at hfull
+        have := mynat.add_left_cancel _ _ _ hfull
+        rw [← mynat.add_assoc (b.x * a.y) _ _] at this
+        rw [mynat.add_comm (b.x * a.y) _] at this
+        rw [mynat.add_assoc (a.y * b.y) _ _] at this
+        have := mynat.add_right_cancel (c * b.x) (a.y * b.y + (b.x * a.y + (c * b.y + a.y * b.y))) (c * b.y) this
+        rename_i h_ -- this is so dirty ...
+        cases c
+        case zero =>
+          apply False.elim
+          rw [mynat.mynat_zero_eq_zero] at hc
+          rw [mynat.add_zero] at hc
+          exact h'' hc
+        case succ d =>
+          have hsnez := mynat.succ_ne_zero d
+          exact mynat.mul_left_cancel (mynat.succ d) b.x b.y hsnez this
 
 theorem mul_eq_zero_iff (a b : myint): a * b = 0 ↔ a = 0 ∨ b = 0 := by
   sorry
