@@ -85,4 +85,20 @@ theorem default_nat_has_no_y (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).y
 theorem default_nat_has_same_x (n : Nat) : (@OfNat.ofNat myint n instOfNatMyint).x = mynat.myofnat n := by
   rw [OfNat.ofNat, instOfNatMyint, myintofnat]
 
+def mynotequal (a b : myint) : Prop := 
+  (a.x + b.y) ≠ (a.y + b.x)
+
+infix:50 " ≉  " => mynotequal
+
+theorem nequiv_iff_not_equiv (a b : myint) : a ≉  b ↔ ¬ (a ≈ b) := by
+  apply Iff.intro
+  . intro h
+    rw [mynotequal] at h
+    rw [equiv_is_myequal, myequal]
+    exact h
+  . intro h
+    rw [equiv_is_myequal, myequal] at h
+    rw [mynotequal]
+    exact h
+
 end myint

@@ -115,4 +115,25 @@ theorem add_equiv (a b c d : myint) : a ≈ b ∧ c ≈ d → a + c ≈ b + d :=
   have hbd := add_left b c d h2
   exact trans hac hbd
 
+theorem ne_add_still_ne (a b t : myint) : a ≉  b → a + t ≉  b + t := by
+  intro h
+  rw [mynotequal] at h ⊢
+  repeat rw [add_eq_myadd, myadd]
+  rw [destruct_x, destruct_y]
+  rw [destruct_y _ (a.y + t.y), destruct_x (b.x + t.x) _]
+  rw [← mynat.add_assoc]
+  rw [mynat.add_assoc a.x]
+  rw [mynat.add_comm t.x]
+  rw [← mynat.add_assoc]
+  rw [← mynat.add_assoc]
+  rw [mynat.add_assoc a.y]
+  rw [mynat.add_comm t.y]
+  rw [← mynat.add_assoc]
+  rw [mynat.add_assoc (a.y + b.x)]
+  rw [mynat.add_comm t.y]
+  rw [mynat.add_assoc (a.x + b.y)]
+  intro h'
+  have := (mynat.add_right_cancel_iff (t.x + t.y) (a.x + b.y) (a.y + b.x)).mp h'
+  exact h this
+
 end myint

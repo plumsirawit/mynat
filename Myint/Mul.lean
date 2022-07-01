@@ -222,4 +222,54 @@ theorem mul_left_comm (a b c : myint) : a * (b * c) ≈ b * (a * c) := by
 
 attribute [simp] mul_assoc mul_comm mul_left_comm
 
+theorem ne_iff_exists_offset (a b : myint) : a ≉  b ↔ ∃ c : myint, a ≈ b + c := sorry
+
+theorem ne_mul_still_ne (a b t : myint) : a ≉  b ∧ t ≉  0 → a * t ≉  b * t := by
+  intro h
+  have hab := h.left
+  have htnz := h.right
+  rw [mynotequal] at hab htnz ⊢
+  rw [zerox, zeroy] at htnz
+  repeat rw [mynat.add_zero] at htnz
+  repeat rw [mul_eq_mymul, mymul]
+  rw [destruct_x]
+  rw [destruct_y _ (b.x * t.y + b.y * t.x)]
+  rw [destruct_y _ (a.x * t.y + a.y * t.x)]
+  rw [destruct_x (b.x * t.x + b.y * t.y) _]
+  sorry
+
+theorem mul_nonzero (a b : myint) : a ≉  0 → b ≉  0 → a * b ≉  0 := by
+  intro ha
+  intro hb
+  rw [mynotequal] at ha hb ⊢
+  rw [zerox, zeroy] at ha hb ⊢
+  repeat rw [mynat.add_zero] at ha hb ⊢
+  rw [mul_eq_mymul, mymul]
+  rw [destruct_x, destruct_y _ (a.x * b.y + a.y * b.x)]
+  sorry
+
+theorem eq_zero_or_eq_zero_of_mul_eq_zero (a b : myint) (h : a * b ≈ 0) :
+  a ≈ 0 ∨ b ≈ 0 := by
+  rw [mul_eq_mymul, mymul] at h
+  rw [equiv_is_myequal, myequal] at h
+  rw [destruct_x, destruct_y _ (a.x * b.y + a.y * b.x)] at h
+  rw [zerox, zeroy] at h
+  repeat rw [mynat.add_zero] at h
+  rw [equiv_is_myequal, myequal, zerox, zeroy, mynat.add_zero, mynat.add_zero]
+  rw [equiv_is_myequal, myequal, zerox, zeroy, mynat.add_zero, mynat.add_zero]
+  apply Or.elim (Classical.em (a.x = a.y))
+  . intro h'
+    apply Or.intro_left
+    exact h'
+  . intro h'
+    apply Or.intro_right
+    have h'' : a.x ≠ a.y := h'
+    have hfull : a.x * b.x + a.y * b.y + a.x * b.y + a.y * b.x = a.x * b.y + a.y * b.x + a.x * b.y + a.y * b.x := by rw [h]
+
+theorem mul_eq_zero_iff (a b : myint): a * b = 0 ↔ a = 0 ∨ b = 0 := by
+  sorry
+
+theorem mul_left_cancel (a b c : myint) (ha : a ≠ 0) : a * b = a * c → b = c := by
+  sorry
+
 end myint
