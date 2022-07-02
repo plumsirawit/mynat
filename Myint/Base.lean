@@ -90,7 +90,7 @@ def mynotequal (a b : myint) : Prop :=
 
 infix:50 " ≉  " => mynotequal
 
-theorem nequiv_iff_not_equiv (a b : myint) : a ≉  b ↔ ¬ (a ≈ b) := by
+theorem nequiv_iff_not_equiv (a b : myint) : a ≉ b ↔ ¬ (a ≈ b) := by
   apply Iff.intro
   . intro h
     rw [mynotequal] at h
