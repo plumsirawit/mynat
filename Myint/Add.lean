@@ -66,10 +66,17 @@ theorem add_assoc (a b c : myint) : (a + b) + c ≈ a + (b + c) := by
     rw [add_y]
     rw [mynat.add_assoc]
 
+theorem add_comm (a b : myint) : a + b ≈ b + a := by
+  apply if_x_and_y_equal_then_equiv
+  apply And.intro
+  . rw [add_x]
+    rw [add_x]
+    rw [mynat.add_comm]
+  . rw [add_y]
+    rw [add_y]
+    rw [mynat.add_comm]
 
-theorem add_comm (a b : myint) : a + b ≈ b + a := sorry
-
--- attribute [simp] add_assoc add_comm
+attribute [simp] add_assoc add_comm
 
 theorem add_right (a b t : myint) : a ≈ b → a + t ≈ b + t := by
   intro h
@@ -93,11 +100,10 @@ theorem add_right (a b t : myint) : a ≈ b → a + t ≈ b + t := by
   rw [← mynat.add_assoc]
 
 theorem add_left (t a b : myint) : a ≈ b → t + a ≈ t + b := by
-  sorry
   intro h
-  rw [add_comm t]
-  rw [add_comm t]
-  exact add_right a b t h
+  have := add_right a b t h
+  have := trans (add_comm t a) this
+  exact trans this (add_comm b t)
 
 theorem add_equiv (a b c d : myint) : a ≈ b ∧ c ≈ d → a + c ≈ b + d := by
   intro h
