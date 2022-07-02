@@ -103,9 +103,10 @@ theorem add_right_cancel (a t b : myint) : a + t ≈ b + t → a ≈ b := by
   exact symm ha2
 
 theorem add_left_cancel (t a b : myint) : t + a ≈ t + b → a ≈ b := by
-  rw [add_comm t a]
-  rw [add_comm t b]
-  exact add_right_cancel a t b
+  have hhelp := add_right_cancel a t b
+  intro h
+  have := trans (trans (add_comm a t) h) (add_comm t b)
+  exact hhelp this
 
 theorem add_right_cancel_iff (t a b : myint) : a + t ≈ b + t ↔ a ≈ b := by
   apply Iff.intro
