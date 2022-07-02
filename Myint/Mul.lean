@@ -248,6 +248,7 @@ theorem mul_nonzero (a b : myint) : a ≉  0 → b ≉  0 → a * b ≉  0 := by
   rw [destruct_x, destruct_y _ (a.x * b.y + a.y * b.x)]
   sorry
 
+-- TODO: rewrite with ne_iff_exists_offset.
 theorem eq_zero_or_eq_zero_of_mul_eq_zero (a b : myint) (h : a * b ≈ 0) :
   a ≈ 0 ∨ b ≈ 0 := by
   rw [mul_eq_mymul, mymul] at h
@@ -313,10 +314,50 @@ theorem eq_zero_or_eq_zero_of_mul_eq_zero (a b : myint) (h : a * b ≈ 0) :
           have hsnez := mynat.succ_ne_zero d
           exact mynat.mul_left_cancel (mynat.succ d) b.x b.y hsnez this
 
-theorem mul_eq_zero_iff (a b : myint): a * b = 0 ↔ a = 0 ∨ b = 0 := by
-  sorry
+theorem mul_eq_zero_iff (a b : myint): a * b ≈ 0 ↔ a ≈ 0 ∨ b ≈ 0 := by
+  apply Iff.intro
+  . intro h
+    exact eq_zero_or_eq_zero_of_mul_eq_zero a b h
+  . intro h
+    cases h
+    . rename_i hh
+      have := mul_right a 0 b hh
+      exact trans this (zero_mul b)
+    . rename_i hh
+      have := mul_right b 0 a hh
+      have := trans this (zero_mul a)
+      have := trans (mul_comm a b) this
+      exact this
 
-theorem mul_left_cancel (a b c : myint) (ha : a ≠ 0) : a * b = a * c → b = c := by
-  sorry
+theorem mul_left_cancel (a b c : myint) (ha : a ≉ 0) : a * b ≈ a * c → b ≈ c := by
+  intro h
+  have := (sub_right (a * b) (a * c) (a * c)) h
+  repeat rw [sub_eq_plusneg] at this
+  have hez : a * b + -(a * c) ≈ 0 := trans this (neg_is_inv _)
+  have : -(a * c) ≈ a * c * -1 := (symm (mul_negone (a * c)))
+  have : a * b + -(a * c) ≈ a * b + a * c * -1 := add_left (a * b) _ _ this
+  have : a * b + a * c * -1 ≈ 0 := trans (symm this) hez
+  have hma : a * c * -1 ≈ a * (c * -1) := mul_assoc _ _ _
+  have hz : a * b + a * (c * -1) ≈ 0 := trans (symm (add_left (a * b) _ _ hma)) this
+  have := mul_add a b (c * -1)
+  have : a * (b + c * -1) ≈ 0 := trans this hz
+  have heitherzero := eq_zero_or_eq_zero_of_mul_eq_zero a (b + c * -1) this
+  cases heitherzero
+  case inl haz =>
+    apply False.elim
+    exact ha haz
+  case inr hs =>
+    have : c + (b + c * -1) ≈ c + 0 := add_left c (b + c * -1) 0 hs
+    have hbc : c + b + c * -1 ≈ c + 0 := trans (add_assoc _ _ _) this
+    have : c * -1 ≈ -c := mul_negone c
+    have : c + b + c * -1 ≈ c + b + -c := add_left _ _ _ this
+    have : c + b + -c ≈ c + 0 := trans (symm this) hbc
+    have : c + b + -c ≈ c := trans this (add_zero c)
+    have hcomm := add_comm b c
+    have := add_right (b + c) (c + b) (-c)
+    have : b + c + -c ≈ c := trans ( hcomm) this
+    -- TODO: use add_comm to fix this
+
+
 
 end myint
