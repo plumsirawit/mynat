@@ -11,6 +11,7 @@ package mynat {
 lean_lib Mynat {
   -- add library configuration options here
 }
+lean_lib Myint
 
 lean_exe mynat {
   root := `Main
