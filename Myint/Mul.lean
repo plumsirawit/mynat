@@ -214,6 +214,11 @@ theorem mul_right (a b t : myint) : a ≈ b → a * t ≈ b * t := by
   rw [mynat.add_assoc, ← mynat.add_mul]
   rw [htx, hty]
 
+theorem mul_left (t a b : myint) : a ≈ b → t * a ≈ t * b := by
+  intro h
+  have := mul_right a b t h
+  exact trans (trans (mul_comm t a) this) (mul_comm b t)
+
 theorem mul_left_comm (a b c : myint) : a * (b * c) ≈ b * (a * c) := by
   have h1 : a * (b * c) ≈ a * b * c := symm (mul_assoc a b c)
   have h2 : a * b * c ≈ b * a * c := mul_right (a * b) (b * a) c (mul_comm a b)

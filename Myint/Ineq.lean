@@ -298,9 +298,103 @@ theorem le_total (a b : myint) : a ≤ b ∨ b ≤ a := by
   -- -- Another logic law
   -- sorry
 
-theorem add_le_add_left {a b : myint} (h : a ≤ b) (t : myint) : t + a ≤ t + b :=  by
+theorem add_le_add_left {a b : myint} (h : a ≤ b) (t : myint) : t + a ≤ t + b := by
   have := add_le_add_right h t
   exact le_trans_equiv _ _ _ (le_equiv_trans _ _ _ (add_comm t a) this) (add_comm b t)
+
+theorem pos_iff_y_le_x (n : myint) : 0 ≤ n ↔ n.y ≤ n.x := by
+  apply Iff.intro
+  . intro h
+    rw [le_iff_exists_add] at h
+    cases h with
+    | intro c hc =>
+      have ⟨ nx, ny ⟩ := n
+      rw [equiv_is_myequal, myequal] at hc
+      rw [destruct_x, destruct_y _ ny] at hc
+      rw [add_y, add_x] at hc
+      rw [destruct_y _ 0, destruct_x c _] at hc
+      rw [destruct_y, destruct_x]
+      exists c
+      rw [zeroy, zerox, mynat.add_zero, mynat.zero_add, mynat.add_zero] at hc
+      exact hc
+  . intro h
+    have := canon_pos n h
+    cases this with
+    | intro c hc =>
+      have ⟨ cx, cy ⟩ := c
+      rw [destruct_y] at hc
+      have ⟨ hc1, hc2 ⟩ := hc
+      rw [hc1] at hc2
+      have : 0 ≤ myint.mk cx 0 := by
+        exists cx
+        exact symm (zero_add (myint.mk cx 0))
+      exact le_trans_equiv _ _ _ this hc2
+
+theorem le_mul_pos (a b : myint) (h : a ≤ b) (t : myint) (ht : 0 ≤ t) : a * t ≤ b * t := by
+  have hpos := ht
+  rw [le_iff_exists_add] at hpos
+  cases h with
+  | intro c hc =>
+    have := mul_right b (a + myint.mk c 0) t hc
+    have huse : b * t ≈ a * t + (myint.mk c 0) * t := trans this (add_mul _ _ _)
+    have := canon_pos t ((pos_iff_y_le_x t).mp ht)
+    cases this with
+    | intro d hd =>
+      have ⟨ dx, dy ⟩ := d
+      rw [destruct_y] at hd
+      have ⟨ hd1, hd2 ⟩ := hd
+      rw [hd1] at hd2
+      have hhelper : a * t + { x := c, y := 0 } * t ≈ a * t + { x := c, y := 0 } * { x := dx, y := 0} := (add_left (a * t) _ _) (mul_left (myint.mk c 0) t (myint.mk dx 0) (symm hd2))
+      have hthis := trans huse hhelper
+      conv at hthis =>
+        rhs
+        arg 2
+        rw [mul_eq_mymul, mymul]
+        rw [destruct_x, destruct_x, destruct_y]
+        rw [mynat.mul_zero, mynat.mul_zero, mynat.zero_mul, mynat.add_zero, mynat.add_zero]
+      exists c * dx
+
+theorem le_mul_neg (a b : myint) (h : a ≤ b) (t : myint) (ht : t ≤ 0) : b * t ≤ a * t := by
+  have : a * (-t) ≤ b * (-t) := by
+    have : 0 ≤ -t := by
+      have := add_le_add_right ht (-t)
+      have := le_equiv_trans _ _ _ (symm (neg_is_inv t)) this
+      exact le_trans_equiv _ _ _ this (zero_add _)
+    exact le_mul_pos a b h (-t) this
+  have hlemma (f g : myint) : f * g + f * -g ≈ 0 := by
+    have : f * g + f * g * -1 ≈ f * g + f * -g := add_left _ _ _ (trans (mul_assoc _ _ _) (mul_left f _ _ (mul_negone g)))
+    have hs3 : f * g * -1 ≈ - (f * g) := mul_negone (f * g)
+    have hs : f * g + -(f * g) ≈ f * g + f * -g := trans (symm (add_left (f * g) _ _ hs3)) this
+    have ht := trans (symm (neg_is_inv (f * g))) hs
+    exact symm ht
+  have : 0 ≤ a * t + b * (-t) := by
+    have hthis := add_le_add_left this (a * t)
+    exact le_equiv_trans _ _ _ (symm (hlemma a t)) hthis
+  have hthis := add_le_add_right this (b * t)
+  have := le_trans_equiv _ _ _ hthis (add_assoc _ _ _)
+  have hadjust := add_left (a * t) _ _ (trans (add_comm _ _) (hlemma b t))
+  have := le_trans_equiv _ _ _ this hadjust
+  exact le_equiv_trans _ _ _ (symm (zero_add (b * t))) this
+
+theorem sq_pos (n : myint) : 0 ≤ n * n := by
+  let pn := 0 ≤ n
+  cases Classical.em pn
+  case inl h =>
+    have : 0 ≤ n := h
+    have := le_mul_pos 0 n this n this
+    exact le_equiv_trans _ _ _ (symm (zero_mul n)) this
+  case inr h =>
+    have : ¬ 0 ≤ n := h
+    have := le_total 0 n
+    cases this
+    case inl hh =>
+      apply False.elim
+      exact this hh
+    case inr hh =>
+      have := le_mul_neg n 0 hh n hh
+      exact le_equiv_trans _ _ _ (symm (zero_mul n)) this
+
+-- actually this obviously implies the simple case of AM-GM inequality...
 
 def mylt (a b : mynat) := a ≤ b ∧ ¬ (b ≤ a)
 instance : LT mynat := ⟨mylt⟩
