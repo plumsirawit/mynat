@@ -400,4 +400,7 @@ def mylt (a b : mynat) := a ≤ b ∧ ¬ (b ≤ a)
 instance : LT mynat := ⟨mylt⟩
 theorem lt_def (a b : mynat) : a < b ↔ a ≤ b ∧ ¬ (b ≤ a) := Iff.rfl
 
+example : (5 : myint) ≤ (10 : myint) := by
+  decide
+
 end myint
