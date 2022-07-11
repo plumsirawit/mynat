@@ -330,6 +330,36 @@ theorem pos_iff_y_le_x (n : myint) : 0 ≤ n ↔ n.y ≤ n.x := by
         exact symm (zero_add (myint.mk cx 0))
       exact le_trans_equiv _ _ _ this hc2
 
+theorem neg_iff_x_le_y (n : myint) : n ≤ 0 ↔ n.x ≤ n.y := by
+  apply Iff.intro
+  . intro h
+    rw [le_iff_exists_add] at h
+    cases h with
+    | intro c hc =>
+      have ⟨ nx, ny ⟩ := n
+      rw [equiv_is_myequal, myequal] at hc
+      rw [add_y, add_x] at hc
+      rw [destruct_y _ 0, destruct_x c _] at hc
+      rw [destruct_y _ ny, destruct_x nx _] at hc
+      rw [destruct_y, destruct_x]
+      exists c
+      rw [zeroy, zerox, mynat.add_zero, mynat.zero_add, mynat.zero_add] at hc
+      exact hc
+  . intro h
+    have := canon_neg n h
+    cases this with
+    | intro c hc =>
+      have ⟨ cx, cy ⟩ := c
+      rw [destruct_x] at hc
+      have ⟨ hc1, hc2 ⟩ := hc
+      rw [hc1] at hc2
+      have : myint.mk 0 cy ≤ 0 := by
+        exists cy
+        rw [equiv_is_myequal, myequal]
+        rw [add_y, add_x, destruct_y, destruct_y, destruct_x 0 _, destruct_x cy _]
+        rw [zerox, zeroy, mynat.add_zero, mynat.zero_add, mynat.zero_add]
+      exact le_equiv_trans _ _ _ (symm hc2) this
+
 theorem le_mul_pos (a b : myint) (h : a ≤ b) (t : myint) (ht : 0 ≤ t) : a * t ≤ b * t := by
   have hpos := ht
   rw [le_iff_exists_add] at hpos
@@ -396,11 +426,108 @@ theorem sq_pos (n : myint) : 0 ≤ n * n := by
 
 -- actually this obviously implies the simple case of AM-GM inequality...
 
-def mylt (a b : mynat) := a ≤ b ∧ ¬ (b ≤ a)
-instance : LT mynat := ⟨mylt⟩
-theorem lt_def (a b : mynat) : a < b ↔ a ≤ b ∧ ¬ (b ≤ a) := Iff.rfl
+def mylt (a b : myint) := a ≤ b ∧ ¬ (b ≤ a)
+instance : LT myint := ⟨mylt⟩
+theorem lt_def (a b : myint) : a < b ↔ a ≤ b ∧ ¬ (b ≤ a) := Iff.rfl
 
-example : (5 : myint) ≤ (10 : myint) := by
-  decide
+-- TODO: should be "XOR" instead of "OR" for the real "trichotomy"
+theorem trichotomy (a b : myint) : a < b ∨ a ≈ b ∨ b < a := by
+  let peq : Prop := a ≈ b
+  cases Classical.em peq
+  case inl hp =>
+    have heq : a ≈ b := hp
+    apply Or.intro_right
+    apply Or.intro_left
+    exact heq
+  case inr hnotp =>
+    have heq : a ≉ b := hnotp
+    have hoffs := (ne_iff_exists_offset a b).mp heq
+    cases hoffs with
+    | intro c hc =>
+      cases le_total 0 c
+      case inl hcz =>
+        apply Or.intro_right
+        apply Or.intro_right
+        apply (lt_def b a).mpr
+        have hxy := (pos_iff_y_le_x c).mp hcz
+        have hcanon := canon_pos c hxy
+        cases hcanon with
+        | intro cn hcn =>
+          have hcnx : { x := cn.x, y := 0 } = cn := by
+            rw [equal_is_xyequal]
+            rw [destruct_x, destruct_y]
+            exact ⟨ rfl, Eq.symm hcn.left ⟩
+          apply And.intro
+          . exists cn.x
+            rw [hcnx]
+            have := add_left b _ _ hcn.right
+            exact trans hc.right (symm this)
+          . intro hfalse
+            cases hfalse with
+            | intro d hd =>
+              have habcn := trans hc.right (symm (add_left b cn c hcn.right))
+              have := add_right _ _ cn hd
+              have := trans habcn this
+              have := trans (add_zero a) this
+              have := trans this (add_assoc _ _ _)
+              have := add_left_cancel a 0 _ this
+              rw [← hcnx] at this
+              rw [equiv_is_myequal, myequal] at this
+              rw [add_y, destruct_y, add_x, destruct_x d _, destruct_x cn.x _, zerox, zeroy] at this
+              rw [mynat.add_zero, mynat.zero_add, mynat.zero_add] at this
+              have hcnxz := mynat.add_left_eq_zero (Eq.symm this)
+              have hcnez := hc.left
+              rw [nequiv_iff_not_equiv] at hcnez
+              have : cn = 0 := by
+                apply (equal_is_xyequal cn 0).mpr
+                rw [zerox, zeroy]
+                exact ⟨ hcnxz, hcn.left ⟩
+              rw [this] at hcn
+              exact hcnez (symm hcn.right)
+      case inr hcz =>
+        apply Or.intro_left
+        apply (lt_def a b).mpr
+        have hcanon := canon_neg c ((neg_iff_x_le_y c).mp hcz)
+        cases hcanon with
+        | intro cn hcn =>
+          have hcny : { x := 0, y := cn.y } = cn := by
+            rw [equal_is_xyequal]
+            rw [destruct_x, destruct_y]
+            exact ⟨ Eq.symm hcn.left, rfl ⟩
+          rw [← hcny] at hcn
+          apply And.intro
+          . exists cn.y
+            have := add_right a (b + c) (-c) hc.right
+            have := trans this (add_assoc _ _ _)
+            have := trans this (add_left b _ _ (neg_is_inv c))
+            have hbac : b ≈ a + (-c) := symm this
+            have hnegc : -c ≈ { x := cn.y, y := 0 } := by
+              have := symm hcn.right
+              have hthis := apply_neg _ _ this
+              conv at hthis =>
+                rhs
+                rw [neg_eq_myneg, myneg]
+                rw [destruct_y, destruct_x]
+              exact hthis
+            have := add_left a _ _ hnegc
+            exact trans hbac this
+          . intro hfalse
+            cases hfalse with
+            | intro d hd =>
+              have := trans (symm hd) hc.right
+              have := add_left_cancel b _ _ this
+              have := trans this (symm hcn.right)
+              rw [myequal] at this
+              rw [destruct_x, destruct_y, destruct_y _ 0, destruct_x] at this
+              rw [mynat.add_zero] at this
+              have hcnyz := mynat.add_left_eq_zero this
+              rw [hcnyz] at hcn
+              have hcnr := hcn.right
+              have hcnrconc : c ≈ 0 := by
+                rw [equiv_is_myequal, myequal, zeroy, zerox, mynat.add_zero, mynat.add_zero]
+                rw [equiv_is_myequal, myequal, destruct_x, destruct_y _ 0, mynat.zero_add, mynat.zero_add] at hcnr
+                exact Eq.symm hcnr
+              exact hc.left hcnrconc
+
 
 end myint

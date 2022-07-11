@@ -12,6 +12,7 @@ lean_lib Mynat {
   -- add library configuration options here
 }
 lean_lib Myint
+lean_lib Elemnumnat
 
 lean_exe mynat {
   root := `Main

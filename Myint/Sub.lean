@@ -10,6 +10,14 @@ instance : Neg myint where
 
 theorem neg_eq_myneg (m : myint) : -m = myneg m := rfl
 
+theorem apply_neg (a b : myint) : a ≈ b → -a ≈ -b := by
+  intro h
+  rw [neg_eq_myneg, neg_eq_myneg, myneg, myneg]
+  rw [equiv_is_myequal, myequal]
+  rw [destruct_x, destruct_y _ b.x, destruct_y _ a.x, destruct_x b.y _]
+  rw [equiv_is_myequal, myequal] at h
+  exact Eq.symm h
+
 def mysub (m n : myint) : myint :=
   m + myneg n
 
@@ -113,5 +121,10 @@ theorem add_right_cancel_iff (t a b : myint) : a + t ≈ b + t ↔ a ≈ b := by
   . exact add_right_cancel a t b
   . intro h
     exact add_right a b t h
+
+theorem swap_xy_eq_neg (a : myint) : myint.mk a.y a.x ≈ -a := by
+  rw [neg_eq_myneg, myneg]
+  apply if_x_and_y_equal_then_equiv
+  exact ⟨ rfl, rfl ⟩
 
 end myint
