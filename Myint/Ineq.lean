@@ -430,6 +430,10 @@ def mylt (a b : myint) := a ≤ b ∧ ¬ (b ≤ a)
 instance : LT myint := ⟨mylt⟩
 theorem lt_def (a b : myint) : a < b ↔ a ≤ b ∧ ¬ (b ≤ a) := Iff.rfl
 
+theorem lt_aux_weak (a b : myint) : a ≤ b ∧ a ≉ b ↔ a < b := sorry
+
+theorem lt_iff_not_ge (a b : mynat) : a < b ↔ ¬ b ≤ a := sorry
+
 -- TODO: should be "XOR" instead of "OR" for the real "trichotomy"
 theorem trichotomy (a b : myint) : a < b ∨ a ≈ b ∨ b < a := by
   let peq : Prop := a ≈ b
@@ -529,5 +533,56 @@ theorem trichotomy (a b : myint) : a < b ∨ a ≈ b ∨ b < a := by
                 exact Eq.symm hcnr
               exact hc.left hcnrconc
 
+theorem le_ext_mynat (a b : mynat) : a ≤ b → myint.mk a 0 ≤ myint.mk b 0 := by
+  intro h
+  cases h with
+  | intro c hc =>
+    rw [hc]
+    exists c
+    apply equal_implies_equiv
+    rw [add_eq_myadd, myadd]
+    rw [destruct_x, destruct_x, destruct_y, mynat.add_zero]
+
+theorem lt_ext_mynat (a b : mynat) : a < b → myint.mk a 0 < myint.mk b 0 := by
+  intro h
+  rw [mynat.lt_iff_succ_le] at h
+  cases h with
+  | intro c hc =>
+    rw [hc]
+    rw [lt_def]
+    apply And.intro
+    . exists mynat.succ c
+      apply if_x_and_y_equal_then_equiv
+      apply And.intro
+      . rw [destruct_x, add_x, destruct_x, destruct_x, mynat.add_succ, mynat.succ_add]
+      . rw [destruct_y, add_y, destruct_y, mynat.add_zero]
+    . intro hfalse
+      cases hfalse with
+      | intro d hd =>
+        rw [add_eq_myadd, myadd, destruct_x, destruct_x, destruct_y, mynat.add_zero] at hd
+        rw [equiv_is_myequal, myequal] at hd
+        rw [destruct_x, destruct_y, destruct_x, mynat.add_zero, mynat.zero_add] at hd
+        rw [mynat.succ_add, mynat.succ_add, ← mynat.add_succ, mynat.add_assoc] at hd
+        have := mynat.add_left_cancel a 0 (c + mynat.succ d) hd
+        have := mynat.add_left_eq_zero (Eq.symm this)
+        exact mynat.succ_ne_zero d this
+
+theorem lt_irrefl (a : myint) : ¬ a < a := sorry
+
+theorem lt_trans_equiv (a b c : myint) (hab : a < b) (hbc : b ≈ c) : a < c := by
+  rw [lt_def] at hab ⊢
+  apply And.intro
+  . exact le_trans_equiv _ _ _ hab.left hbc
+  . intro hfalse
+    have := le_equiv_trans _ _ _ hbc hfalse
+    exact hab.right this
+
+theorem lt_equiv_trans (a b c : myint) (hab : a ≈ b) (hbc : b < c) : a < c := by
+  rw [lt_def] at hbc ⊢
+  apply And.intro
+  . exact le_equiv_trans _ _ _ hab hbc.left
+  . intro hfalse
+    have := le_trans_equiv _ _ _ hfalse hab
+    exact hbc.right this
 
 end myint
