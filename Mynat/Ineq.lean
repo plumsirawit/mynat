@@ -209,4 +209,40 @@ theorem lt_iff_succ_le (a b : mynat) : a < b ↔ succ a ≤ b := by
   . apply lt_aux_one
   . apply lt_aux_two
 
+theorem lt_aux_weak (a b : mynat) : a ≤ b ∧ a ≠ b ↔ a < b := by
+  apply Iff.intro
+  . intro h
+    have : ¬ b ≤ a := by
+      intro hfalse
+      have := le_antisymm _ _ hfalse h.left
+      exact h.right (Eq.symm this)
+    apply (lt_iff_succ_le a b).mpr
+    exact lt_aux_one _ _ ⟨ h.left, this ⟩
+  . intro h
+    apply And.intro
+    . rw [lt_iff_succ_le] at h
+      exact le_trans _ _ _ (le_succ_self a) h
+    . intro hfalse
+      rw [hfalse] at h
+      rw [lt_def] at h
+      exact h.right (le_refl b)
+
+theorem lt_iff_not_ge (a b : mynat) : a < b ↔ ¬ b ≤ a := by
+  apply Iff.intro
+  . intro h
+    rw [lt_def] at h
+    exact h.right
+  . intro h
+    rw [lt_def]
+    cases Classical.em (a ≤ b)
+    case inl htrue =>
+      exact ⟨ htrue, h ⟩
+    case inr hfalse =>
+      apply False.elim
+      cases le_total a b
+      case inl hab =>
+        exact hfalse hab
+      case inr hab =>
+        exact h hab
+
 end mynat
