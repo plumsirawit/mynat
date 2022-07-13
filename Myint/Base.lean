@@ -1,4 +1,4 @@
-import Mynat.Ineq
+import Mynat.Extras
 
 structure myint where
   x : mynat
